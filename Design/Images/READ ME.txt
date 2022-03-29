@@ -1,0 +1,11 @@
+This is how you combine multiple images into a vertical strip automatically.
+
+Download imagemagick:
+
+https://imagemagick.org/script/download.php
+
+Open the folder that contains the pictures in the terminal and run the following script. 
+The processed image is saved in the "output" folder.
+
+mkdir output
+magick *.png -append "output\\output.png"
