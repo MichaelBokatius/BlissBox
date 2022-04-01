@@ -25,6 +25,12 @@ The provided plug-in is compiled in the VST3 format and may not work in other op
 
 ## GUI
 
+### Importing images into the project
+
+To compile the plug-in with the provided images, one can simply open the projucer-project and import the images via drag and drop into the file explorer. The files will then be marked as binary resources and can be used in the project like so:
+
+`juce::Image example_png = juce::ImageCache::getFromMemory(BinaryData::example_png, BinaryData::example_pngSize);`
+
 ### How to combine multiple images into a vertical filmstrip automatically
 
 Download [imagemagick](https://imagemagick.org/script/download.php).
