@@ -20,7 +20,6 @@ flowchart LR;
 ```
 ## Compatibility
 
-
 The provided plug-in is compiled in the VST3 format and may not work in other operating systems besides Windows. I recommend [Reaper](https://www.reaper.fm/), which is technically free, or [FL Studio](https://www.image-line.com/) to use the plug-in.
 
 ## GUI
@@ -55,7 +54,8 @@ magick *.png -append "output\\output.png"
 - [ ] getHostInformation function
 
 ## References
-[^1]: [Dispatch Master by Earthquaker Devices](https://www.thomann.de/de/earthquaker_devices_dispatch_master_v3.htm)
+
+[^1]: [Dispatch Master by Earthquaker Devices](https://www.earthquakerdevices.com/dispatch-master)
 
 [^2]: [JUCE Tutorial 15 - Creating a Circular Buffer by The Audio Programmer](https://www.youtube.com/watch?v=2oCb3SXBcTI)
 
