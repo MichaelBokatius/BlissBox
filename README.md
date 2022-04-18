@@ -20,7 +20,7 @@ flowchart LR;
 ```
 ## Compatibility
 
-The provided plug-in is compiled in the VST3 format and may not work in other operating systems besides Windows. I recommend [Reaper](https://www.reaper.fm/), which is technically free, or [FL Studio](https://www.image-line.com/) to use the plug-in.
+The provided plug-in is compiled in the VST3 format and may not work in other operating systems besides Windows. I recommend [Reaper](https://www.reaper.fm/), which is technically free, [FL Studio](https://www.image-line.com/), [Cubase](https://www.steinberg.net/cubase/), [Live](https://www.ableton.com/en/live/) or [Adobe Audition](https://www.adobe.com/products/audition.html) to use the plug-in.
 
 ## GUI
 
