@@ -1,6 +1,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "HybridEditor.h"
 
 
 juce::AudioProcessorValueTreeState::ParameterLayout BlissBoxAudioProcessor::createParameterLayout()
@@ -428,7 +429,7 @@ juce::AudioProcessorEditor* BlissBoxAudioProcessor::createEditor()
     //return new juce::GenericAudioProcessorEditor(*this);
 
     // CUSTOM GUI - final GUI
-    return new BlissBoxAudioProcessorEditor (*this);
+    return new HybridEditor (*this);
 }
 
 //==============================================================================

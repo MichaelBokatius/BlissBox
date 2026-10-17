@@ -18,12 +18,15 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
+    juce::String getParameterReadout() const;
+    void mouseEnter(const juce::MouseEvent& event) override;
+    void mouseExit(const juce::MouseEvent& event) override;
 
     //==============================================================================
 
         void sliderValueChanged(Slider* sliderThatWasMoved) override;
         void buttonClicked(Button* buttonThatWasClicked) override;
-        void timerCallback() override {};
+        void timerCallback() override;
         void setSliderComponent(Slider& slider, std::unique_ptr <AudioProcessorValueTreeState::SliderAttachment>& sliderAttachment, juce::String paramName);
         void setSliderComponentNoPopUpDisplay(Slider& slider, std::unique_ptr <AudioProcessorValueTreeState::SliderAttachment>& sliderAttachment, juce::String paramName);
 
@@ -33,6 +36,10 @@ public:
 private:
 
     BlissBoxAudioProcessor& audioProcessor;
+    std::vector<float> lastParameterValues;
+    Slider* hoveredSlider = nullptr;
+    Slider* movedSlider = nullptr;
+    double lastMoveTime = 0;
    
         Image background_png;                           
         Image led_On_png;                               

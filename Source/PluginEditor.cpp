@@ -2,6 +2,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "BlissBoxSlider.h"
+#include <BinaryData.h>
 
 using namespace juce;
 
@@ -74,6 +75,21 @@ BlissBoxAudioProcessorEditor::BlissBoxAudioProcessorEditor (BlissBoxAudioProcess
 
     setSize (1280, 650);
     repaintFlag = true;
+    startTimerHz(30);
+}
+
+void BlissBoxAudioProcessorEditor::timerCallback()
+{
+    if (!isShowing()) return;
+    std::vector<float> values;
+    for (auto* parameter : audioProcessor.getParameters()) values.push_back(parameter->getValue());
+    if (values == lastParameterValues && !repaintFlag) return;
+    lastParameterValues = std::move(values);
+    Footswitch_BypassPressed = audioProcessor.getParameterValueBool("Bypass_OnOff");
+    Footswitch_FreezePressed = audioProcessor.getParameterValueBool("Reverb_Freeze");
+    Footswitch_LimiterPressed = audioProcessor.getParameterValueBool("Limiter_OnOff");
+    repaintFlag = true;
+    repaint();
 }
 
 //==============================================================================
@@ -209,6 +225,11 @@ void BlissBoxAudioProcessorEditor::resized()
 
 void BlissBoxAudioProcessorEditor::sliderValueChanged(Slider* sliderThatWasMoved)
 {
+    if (sliderThatWasMoved->isMouseOverOrDragging() || sliderThatWasMoved->hasKeyboardFocus(false))
+    {
+        movedSlider = sliderThatWasMoved;
+        lastMoveTime = juce::Time::getMillisecondCounterHiRes();
+    }
     repaintFlag = true;
     repaint();
 } 
@@ -238,7 +259,10 @@ void BlissBoxAudioProcessorEditor::setSliderComponent(Slider& slider, std::uniqu
     slider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
     slider.setTextBoxStyle(Slider::TextBoxLeft, false, 0, 0);
 
-    slider.setPopupDisplayEnabled(true, true, this, 2000);
+    slider.setPopupDisplayEnabled(false, false, this);
+    slider.setDoubleClickReturnValue(true, 0.0);
+    slider.setComponentID(paramName);
+    slider.addMouseListener(this, false);
 
     slider.setValue(audioProcessor.getParameterValueFloat(paramName));
     addAndMakeVisible(&slider);
@@ -247,6 +271,8 @@ void BlissBoxAudioProcessorEditor::setSliderComponent(Slider& slider, std::uniqu
 
 void BlissBoxAudioProcessorEditor::setSliderComponentNoPopUpDisplay(Slider& slider, std::unique_ptr <AudioProcessorValueTreeState::SliderAttachment>& sliderAttachment, juce::String paramName)
 {
+    slider.setComponentID(paramName);
+    slider.addMouseListener(this, false);
     sliderAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, paramName, slider);
     slider.addListener(this);
     slider.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
@@ -254,4 +280,39 @@ void BlissBoxAudioProcessorEditor::setSliderComponentNoPopUpDisplay(Slider& slid
     slider.setValue(audioProcessor.getParameterValueFloat(paramName));
     addAndMakeVisible(&slider);
     slider.setAlpha(0);
+}
+
+void BlissBoxAudioProcessorEditor::mouseEnter(const juce::MouseEvent& event)
+{
+    hoveredSlider = dynamic_cast<Slider*>(event.eventComponent);
+}
+
+void BlissBoxAudioProcessorEditor::mouseExit(const juce::MouseEvent& event)
+{
+    if (event.eventComponent == hoveredSlider) hoveredSlider = nullptr;
+}
+
+juce::String BlissBoxAudioProcessorEditor::getParameterReadout() const
+{
+    auto* slider = hoveredSlider;
+    for (auto* child : getChildren())
+        if (auto* candidate = dynamic_cast<Slider*>(child))
+            if (candidate->isMouseButtonDown()) slider = candidate;
+    if (!slider && movedSlider && juce::Time::getMillisecondCounterHiRes() - lastMoveTime < 600)
+        slider = movedSlider;
+    if (!slider) return {};
+    const auto id = slider->getComponentID();
+    const auto value = slider->getValue();
+    juce::String text;
+    if (id.startsWith("Delay_Time")) text = juce::StringArray {"1/1", "1/2", "1/3", "1/4", "1/6", "1/8", "1/12"}[(int) value];
+    else if (id == "Reverb_Width") text = juce::StringArray {"Wide", "Middle", "Narrow"}[(int) value];
+    else if (id == "Reverb_EQMode") text = juce::StringArray {"Cold", "Neutral", "Warm"}[(int) value];
+    else if (id == "Chorus_Rate") text = juce::String(value, 2) + " Hz";
+    else if (id == "Chorus_Depth") text = juce::String(value, 3);
+    else text = juce::String(juce::roundToInt(value * (id == "Reverb_Size" ? 100 : 1))) + "%";
+    auto label = id.replaceCharacter('_', ' ');
+    if (id == "Delay_TimeL") label = "Delay left division";
+    if (id == "Delay_TimeR") label = "Delay right division";
+    if (id == "Reverb_EQMode") label = "Reverb EQ mode";
+    return label + juce::String::fromUTF8(" · ") + text;
 }
