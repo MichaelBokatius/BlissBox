@@ -2,6 +2,8 @@
 A guitar pedal VST plug-in made with the [JUCE](https://juce.com/) framework.
 
 <img src= "Design/Images/background.png" >
+<img width="958" height="526" alt="Version 2 Interface" src="https://github.com/user-attachments/assets/13e3ab18-e22b-48c1-a462-6b60be1c3f17" />
+
 
 ## Overview
 
